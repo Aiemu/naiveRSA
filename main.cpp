@@ -4,15 +4,12 @@
 
 #include "include/BigInteger.h"
 
-#include <iostream>
-#include <limits>
-
 int main() {
-    BigInteger a("55");
-    BigInteger b("100");
+    BigInteger a("73910485793485713875831573045738503957019483750139847503985709845709834752584767845610397634581435613756134598135897136495");
+    BigInteger b("78465287456247545634532958345638754");
     a.print();
     b.print();
-    a = a - b;
+    a = a % b;
     a.print();
     return 0;
 }

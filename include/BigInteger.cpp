@@ -11,6 +11,8 @@
 //#include <cstring>
 #include <string>
 
+using namespace std;
+
 BigInteger::BigInteger() {
     this->sign = true;
     this->num.push_back(0);
@@ -30,10 +32,32 @@ BigInteger::BigInteger(const char* num) {
     }
 }
 
+BigInteger::BigInteger(bool sign, std::vector<int> num) {
+    this->sign = sign;
+    this->num = num;
+}
+
 BigInteger::~BigInteger() {}
 
 bool& BigInteger::get_sign() {
     return this->sign;
+}
+
+std::vector<int>& BigInteger::get_num() {
+    return this->num;
+}
+
+void BigInteger::format() {
+    for (long long i = this->num.size() - 1; i > 0; i--) {
+        if (this->num.at(i) == 0) {
+            this->num.pop_back();
+        } else {
+            break;
+        }
+    }
+    if (this->num.empty()) {
+        this->num.push_back(0);
+    }
 }
 
 void BigInteger::print() {
@@ -43,11 +67,6 @@ void BigInteger::print() {
         std::cout << this->num.at(i);
     }
     std::cout << std::endl;
-}
-
-std::vector<int>& BigInteger::get_num() {
-    std::cout << std::endl;
-    return this->num;
 }
 
 BigInteger::operator long long() {
@@ -84,6 +103,8 @@ BigInteger& BigInteger::operator=(BigInteger num_b) {
 }
 
 bool BigInteger::operator==(BigInteger num_b) {
+    this->format();
+    num_b.format();
     return this->sign == num_b.sign && this->num == num_b.num;
 }
 
@@ -92,6 +113,8 @@ bool BigInteger::operator!=(BigInteger num_b) {
 }
 
 bool BigInteger::operator>(BigInteger num_b) {
+    this->format();
+    num_b.format();
     if (this->sign && !num_b.sign) {return true;}
     if (!this->sign && num_b.sign) {return false;}
     if (this->sign) {
@@ -117,16 +140,23 @@ bool BigInteger::operator>(BigInteger num_b) {
     return false;
 }
 
-bool BigInteger::operator<(BigInteger num_b) {
-    return num_b > *this;
-}
-
 bool BigInteger::operator>=(BigInteger num_b) {
     return *this == num_b || *this > num_b;
 }
 
+bool BigInteger::operator<(BigInteger num_b) {
+    return !(*this >= num_b);
+}
+
 bool BigInteger::operator<=(BigInteger num_b) {
-    return !(num_b > *this);
+    return *this < num_b || *this == num_b;
+}
+
+BigInteger BigInteger::get_abs() {
+    BigInteger ret;
+    ret = *this;
+    ret.sign = true;
+    return ret;
 }
 
 BigInteger BigInteger::operator+(BigInteger num_b) {
@@ -171,6 +201,10 @@ BigInteger BigInteger::operator-(BigInteger num_b) {
             for (long long i = 0; i < this->num.size(); i++) {
                 int tmp = flag ? this->num.at(i) - 1 : this->num.at(i);
                 flag = false;
+                if (tmp < 0) {
+                    flag = true;
+                    tmp += 10;
+                }
                 if (i < num_b.num.size()) {
                     tmp -= num_b.num.at(i);
                     if (tmp < 0) {
@@ -178,9 +212,7 @@ BigInteger BigInteger::operator-(BigInteger num_b) {
                         flag = true;
                     }
                 }
-                if (!(i == this->num.size() - 1 && tmp == 0)) {
-                    ret.num.push_back(tmp);
-                }
+                ret.num.push_back(tmp);
             }
             ret.sign = *this > num_b;
         } else {
@@ -189,6 +221,10 @@ BigInteger BigInteger::operator-(BigInteger num_b) {
             for (long long i = 0; i < num_b.num.size(); i++) {
                 int tmp = flag ? num_b.num.at(i) - 1 : num_b.num.at(i);
                 flag = false;
+                if (tmp < 0) {
+                    flag = true;
+                    tmp += 10;
+                }
                 if (i < this->num.size()) {
                     tmp -= this->num.at(i);
                     if (tmp < 0) {
@@ -209,25 +245,151 @@ BigInteger BigInteger::operator-(BigInteger num_b) {
         ret = (this->sign ? *this : num_b) + tmp;
         ret.sign = this->sign;
     }
+    ret.format();
     return ret;
 }
 
-BigInteger BigInteger::operator*(BigInteger num_b) {}
+BigInteger BigInteger::operator*(BigInteger num_b) {
+    BigInteger ret;
+    if (num_b == ret || *this == ret) {} else {
+        for (long long i = 0; i < this->num.size(); i++) {
+            BigInteger loop;
+            int add = 0;
+            loop.num.clear();
+            for (long long j = 0; j < num_b.num.size(); j++) {
+                int tmp = this->num.at(i) * num_b.num.at(j) + add;
+                add = tmp / 10;
+                loop.num.push_back(tmp % 10);
+            }
+            if (add > 0) {
+                loop.num.push_back(add);
+            }
+            for (long long k = 0; k < i; k++) {
+                loop.num.insert(loop.num.begin(), 0);
+            }
+            ret += loop;
+        }
+        ret.sign = (this->sign && num_b.sign) || (!this->sign && !num_b.sign);
+    }
+    ret.format();
+    return ret;
+}
 
-BigInteger BigInteger::operator/(BigInteger num_b) {}
+BigInteger BigInteger::operator/(BigInteger num_b) {
+    BigInteger ret;
+    if (num_b == ret) {
+        throw std::runtime_error("Divider can not be zero.");
+    }
+    else if (*this == ret) {}
+    else if (this->get_abs() == num_b.get_abs()) {
+        if ((num_b.sign && this->sign) || (!num_b.sign && !this->sign)) {
+            return BigInteger(1);
+        } else {
+            return BigInteger(-1);
+        }
+    }
+    else if (this->get_abs() > num_b.get_abs()) {
+        ret.num.clear();
+        BigInteger tmp(true, std::vector<int>(this->num.end() - num_b.num.size(), this->num.end()));
+        for (long long i = this->num.size() - num_b.num.size(); i >= 0; i--) {
+            for (int j = 9; j >= 0; j--) {
+                if (num_b.get_abs() * BigInteger(j) <= tmp) {
+                    if (!(i == this->num.size() - num_b.num.size() && j == 0)) {
+                        ret.num.insert(ret.num.begin(), j);
+                    }
+                    tmp -= num_b.get_abs() * BigInteger(j);
+                    if (tmp == BigInteger()) {
+                        tmp.num.clear();
+                    }
+                    if (i == 0) {
+                        ret.sign = (this->sign && num_b.sign) || (!this->sign && !num_b.sign);
+                        return ret;
+                    }
+                    tmp.num.insert(tmp.num.begin(), this->num.at(i - 1));
+                    break;
+                }
+            }
+        }
+    }
+    else if (this->get_abs() < num_b.get_abs()) {}
+    return ret;
+}
 
-BigInteger BigInteger::operator%(BigInteger num_b) {}
+BigInteger BigInteger::operator%(BigInteger num_b) {
+    BigInteger ret;
+    if (num_b == ret) {
+        throw std::runtime_error("Divider can not be zero.");
+    }
+    else if (*this == ret) {}
+    else if (this->get_abs() == num_b.get_abs()) {}
+    else if (this->get_abs() > num_b.get_abs()) {
+        ret.num.clear();
+        BigInteger tmp(true, std::vector<int>(this->num.end() - num_b.num.size(), this->num.end()));
+        for (long long i = this->num.size() - num_b.num.size(); i >= 0; i--) {
+            for (int j = 9; j >= 0; j--) {
+                if (num_b.get_abs() * BigInteger(j) <= tmp) {
+                    if (!(i == this->num.size() - num_b.num.size() && j == 0)) {
+                        ret.num.insert(ret.num.begin(), j);
+                    }
+                    tmp -= num_b.get_abs() * BigInteger(j);
+                    if (tmp == BigInteger()) {
+                        tmp.num.clear();
+                    }
+                    if (i == 0) {
+                        ret.sign = (this->sign && num_b.sign) || (!this->sign && !num_b.sign);
+                        return *this - ret * num_b;
+                    }
+                    tmp.num.insert(tmp.num.begin(), this->num.at(i - 1));
+                    break;
+                }
+            }
+        }
+    }
+    else if (this->get_abs() < num_b.get_abs()) {return *this;}
+    return ret;
+}
 
-BigInteger BigInteger::operator++() {}
+BigInteger BigInteger::operator++() {
+    *this = *this + BigInteger(1);
+    return *this;
+}
 
-BigInteger BigInteger::operator--() {}
+BigInteger BigInteger::operator--() {
+    *this = *this + BigInteger(-1);
+    return *this;
+}
 
-BigInteger BigInteger::operator+=(BigInteger num_b) {}
+BigInteger BigInteger::operator++(int) {
+    *this = *this + BigInteger(1);
+    return *this;
+}
 
-BigInteger BigInteger::operator-=(BigInteger num_b) {}
+BigInteger BigInteger::operator--(int) {
+    *this = *this + BigInteger(-1);
+    return *this;
+}
 
-BigInteger BigInteger::operator*=(BigInteger num_b) {}
+BigInteger BigInteger::operator+=(BigInteger num_b) {
+    *this = *this + num_b;
+    return *this;
+}
 
-BigInteger BigInteger::operator/=(BigInteger num_b) {}
+BigInteger BigInteger::operator-=(BigInteger num_b) {
+    *this = *this - num_b;
+    return *this;
+}
 
-BigInteger BigInteger::operator%=(BigInteger num_b) {}
+BigInteger BigInteger::operator*=(BigInteger num_b) {
+    *this = *this * num_b;
+    return *this;
+}
+
+BigInteger BigInteger::operator/=(BigInteger num_b) {
+    *this = *this / num_b;
+    return *this;
+}
+
+BigInteger BigInteger::operator%=(BigInteger num_b) {
+    *this = *this % num_b;
+    return *this;
+}

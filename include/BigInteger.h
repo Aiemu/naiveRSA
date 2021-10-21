@@ -18,6 +18,7 @@ class BigInteger {
         BigInteger();
         explicit BigInteger(long long num);
         explicit BigInteger(const char* num);
+        explicit BigInteger(bool sign, std::vector<int> num);
         ~BigInteger();
 
         explicit operator long long();
@@ -37,8 +38,12 @@ class BigInteger {
         BigInteger operator/(BigInteger num_b);
         BigInteger operator%(BigInteger num_b);
 
-        BigInteger operator++();
+        BigInteger get_abs();
+
+        BigInteger operator++(); // front
         BigInteger operator--();
+        BigInteger operator++(int); // back
+        BigInteger operator--(int);
         BigInteger operator+=(BigInteger num_b);
         BigInteger operator-=(BigInteger num_b);
         BigInteger operator*=(BigInteger num_b);
@@ -49,6 +54,7 @@ class BigInteger {
         std::vector<int>& get_num();
 
         void print();
+        void format();
 
 };
 
