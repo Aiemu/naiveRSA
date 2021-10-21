@@ -1,0 +1,1 @@
+/usr/bin/g++ -g -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.3.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/naiveRSA.dir/main.cpp.o CMakeFiles/naiveRSA.dir/include/BigInteger.cpp.o -o naiveRSA 

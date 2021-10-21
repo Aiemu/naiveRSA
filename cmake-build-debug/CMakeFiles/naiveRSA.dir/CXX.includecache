@@ -1,0 +1,20 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/Aiemu/Documents/02-Coursewares/Master/Encryption/navieRSA/include/BigInteger.h
+iostream
+-
+vector
+-
+cstring
+-
+
+/Users/Aiemu/Documents/02-Coursewares/Master/Encryption/navieRSA/main.cpp
+include/BigInteger.h
+/Users/Aiemu/Documents/02-Coursewares/Master/Encryption/navieRSA/include/BigInteger.h
+
