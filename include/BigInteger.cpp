@@ -8,8 +8,7 @@
 #include <cmath>
 #include <limits>
 #include <stdexcept>
-//#include <cstring>
-#include <string>
+#include <ctime>
 
 using namespace std;
 
@@ -392,4 +391,94 @@ BigInteger BigInteger::operator/=(BigInteger num_b) {
 BigInteger BigInteger::operator%=(BigInteger num_b) {
     *this = *this % num_b;
     return *this;
+}
+
+BigInteger BigInteger::pow(BigInteger k) {
+    BigInteger ret(1);
+    BigInteger tmp = *this;
+    while (k > BigInteger()) {
+        if (k % BigInteger(2) == BigInteger(1)) {
+            ret *= tmp;
+        }
+        tmp *= tmp;
+        k /= BigInteger(2);                     //位运算：b/=2;
+    }
+    return ret;
+}
+
+BigInteger BigInteger::pow(BigInteger k, BigInteger mod) {
+    BigInteger ret(1);
+    BigInteger tmp = *this;
+    while (k > BigInteger()) {
+        if (k % BigInteger(2) == BigInteger(1)) {
+            ret = ret * tmp % mod;
+        }
+        ret = ret * ret % mod;
+        k /= BigInteger(2);                     //位运算：b/=2;
+    }
+    return ret;
+}
+
+BigInteger BigInteger::generate_rand_big_integer(long long len) {
+    BigInteger ret;
+    ret.num.clear();
+    srand((unsigned)time(NULL));
+    for (long long i = 0; i < len - 1; i++) {
+        ret.num.push_back(rand() % 10);
+    }
+
+    int tmp = 0;
+    do {
+        tmp = rand() % 10;
+    } while (tmp == 0);
+    ret.num.push_back(tmp);
+    ret.format();
+
+    if (ret.num.size() != len) {
+        ret.print();
+        cout << "len: " << len << "\nsize: " << ret.num.size() << "\n";
+        throw runtime_error("Generate rand big integer with wrong length.");
+    }
+    return ret;
+}
+
+BigInteger BigInteger::generate_rand_big_integer(BigInteger begin, BigInteger end) {
+    BigInteger ret;
+    ret.num.clear();
+    srand((unsigned)time(NULL));
+    for (long long i = 0; i < end.num.size(); i++) {
+        ret.num.push_back(rand() % 10);
+    }
+    ret.format();
+    return ret % (end - begin + BigInteger(1)) + begin;
+}
+
+bool BigInteger::try_composite(BigInteger a, BigInteger m, BigInteger k) {
+    if (a.pow(m) % *this == BigInteger(1)) {return false;}
+    for (BigInteger j; j < k; j++) {
+        if (a.pow(BigInteger(2).pow(j) * m) % *this == *this - BigInteger(1)) {return false;}
+    }
+    return true;
+}
+
+bool BigInteger::is_probable_prime(int certainty) {
+    if (*this == BigInteger(2)) {return true;}
+    if (*this <= BigInteger(2)) {return false;}
+    if (*this % BigInteger(2) == BigInteger()) {return false;}
+    BigInteger m = *this - BigInteger(1);
+    BigInteger k;
+    while (m % BigInteger(2) == BigInteger()) { // *this - 1 = m * 2^k
+        m = m / BigInteger(2);
+        k++;
+    }
+
+    for (int i = 0; i < certainty; i++) {
+        BigInteger a = this->generate_rand_big_integer(BigInteger(2), *this - BigInteger(1));
+        a.print();
+        if (this->try_composite(BigInteger(3), m, k)) {
+            return false;
+        }
+        cout << i << '\n';
+    }
+    return true;
 }
