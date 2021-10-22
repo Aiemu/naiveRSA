@@ -79,6 +79,7 @@ BigInteger::operator long long() {
         ret *= 10;
         ret += this->num.at(i);
     }
+    return ret;
 }
 
 BigInteger& BigInteger::operator=(long long num_b) {
@@ -289,25 +290,23 @@ BigInteger BigInteger::operator/(BigInteger num_b) {
     }
     else if (this->get_abs() > num_b.get_abs()) {
         ret.num.clear();
-        BigInteger tmp(true, std::vector<int>(this->num.end() - num_b.num.size(), this->num.end()));
+        BigInteger reminder = *this;
         for (long long i = this->num.size() - num_b.num.size(); i >= 0; i--) {
-            for (int j = 9; j >= 0; j--) {
-                if (num_b.get_abs() * BigInteger(j) <= tmp) {
-                    if (!(i == this->num.size() - num_b.num.size() && j == 0)) {
-                        ret.num.insert(ret.num.begin(), j);
-                    }
-                    tmp -= num_b.get_abs() * BigInteger(j);
-                    if (tmp == BigInteger()) {
-                        tmp.num.clear();
-                    }
-                    if (i == 0) {
-                        ret.sign = (this->sign && num_b.sign) || (!this->sign && !num_b.sign);
-                        return ret;
-                    }
-                    tmp.num.insert(tmp.num.begin(), this->num.at(i - 1));
-                    break;
-                }
+            BigInteger tmp(true, num_b.num);
+            for (long long j = 0; j < i; j++) {
+                tmp.num.insert(tmp.num.begin(), 0);
             }
+            int cnt = 0;
+            while (reminder >= tmp) {
+                cnt++;
+                reminder -= tmp;
+            }
+            BigInteger div(cnt);
+            for (long long j = 0; j < i; j++) {
+                div.num.insert(div.num.begin(), 0);
+            }
+            div.format();
+            ret += div;
         }
     }
     else if (this->get_abs() < num_b.get_abs()) {}
@@ -323,26 +322,19 @@ BigInteger BigInteger::operator%(BigInteger num_b) {
     else if (this->get_abs() == num_b.get_abs()) {}
     else if (this->get_abs() > num_b.get_abs()) {
         ret.num.clear();
-        BigInteger tmp(true, std::vector<int>(this->num.end() - num_b.num.size(), this->num.end()));
+        BigInteger reminder = *this;
         for (long long i = this->num.size() - num_b.num.size(); i >= 0; i--) {
-            for (int j = 9; j >= 0; j--) {
-                if (num_b.get_abs() * BigInteger(j) <= tmp) {
-                    if (!(i == this->num.size() - num_b.num.size() && j == 0)) {
-                        ret.num.insert(ret.num.begin(), j);
-                    }
-                    tmp -= num_b.get_abs() * BigInteger(j);
-                    if (tmp == BigInteger()) {
-                        tmp.num.clear();
-                    }
-                    if (i == 0) {
-                        ret.sign = (this->sign && num_b.sign) || (!this->sign && !num_b.sign);
-                        return *this - ret * num_b;
-                    }
-                    tmp.num.insert(tmp.num.begin(), this->num.at(i - 1));
-                    break;
-                }
+            BigInteger tmp(true, num_b.num);
+            for (long long j = 0; j < i; j++) {
+                tmp.num.insert(tmp.num.begin(), 0);
+            }
+            int cnt = 0;
+            while (reminder >= tmp) {
+                cnt++;
+                reminder -= tmp;
             }
         }
+        ret = reminder;
     }
     else if (this->get_abs() < num_b.get_abs()) {return *this;}
     return ret;
@@ -401,7 +393,7 @@ BigInteger BigInteger::pow(BigInteger k) {
             ret *= tmp;
         }
         tmp *= tmp;
-        k /= BigInteger(2);                     //位运算：b/=2;
+        k /= BigInteger(2);
     }
     return ret;
 }
@@ -413,8 +405,8 @@ BigInteger BigInteger::pow(BigInteger k, BigInteger mod) {
         if (k % BigInteger(2) == BigInteger(1)) {
             ret = ret * tmp % mod;
         }
-        ret = ret * ret % mod;
-        k /= BigInteger(2);                     //位运算：b/=2;
+        tmp = tmp * tmp % mod;
+        k /= BigInteger(2);
     }
     return ret;
 }
@@ -454,9 +446,9 @@ BigInteger BigInteger::generate_rand_big_integer(BigInteger begin, BigInteger en
 }
 
 bool BigInteger::try_composite(BigInteger a, BigInteger m, BigInteger k) {
-    if (a.pow(m) % *this == BigInteger(1)) {return false;}
+    if (a.pow(m, *this) == BigInteger(1)) {return false;}
     for (BigInteger j; j < k; j++) {
-        if (a.pow(BigInteger(2).pow(j) * m) % *this == *this - BigInteger(1)) {return false;}
+        if (a.pow(BigInteger(2).pow(j) * m, *this) == *this - BigInteger(1)) {return false;}
     }
     return true;
 }
@@ -478,7 +470,7 @@ bool BigInteger::is_probable_prime(int certainty) {
         if (this->try_composite(BigInteger(3), m, k)) {
             return false;
         }
-        cout << i << '\n';
+//        cout << i << '\n';
     }
     return true;
 }
