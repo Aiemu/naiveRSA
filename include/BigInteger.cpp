@@ -470,7 +470,6 @@ bool BigInteger::is_probable_prime(int certainty) {
         if (this->try_composite(BigInteger(3), m, k)) {
             return false;
         }
-//        cout << i << '\n';
     }
     return true;
 }
