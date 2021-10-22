@@ -4,7 +4,6 @@
 
 #include "include/BigInteger.h"
 
-// use Miller-Rabin primality test
 // RSA-768（768 bits, 232 digits）
 // 1. find prime p, q, n = p * q, phi(n) = (p - 1) * (q - 1)
 // 2. find e, let 1 < e < phi(n), and gcd(e, phi(n)) == 1, usually 3 or 65537
@@ -12,6 +11,7 @@
 // 4. public key: (n, e), private key: (n, d)
 // 5. encryption(to compute c): m^e = c (mod n)
 // 6. decryption(to compute m): c^d = m (mod n)
+// 7. generate(<RSA-786) time < 1s
 
 int main() {
 //    BigInteger a("155251809230070893514897948846250255525688601711663681113905203802605095268637688232123840882864647795048773069713113");
