@@ -22,47 +22,53 @@ int main() {
 //    b.print();
 //    a = a * b;
 //    a.print();
-<<<<<<< HEAD
 //    BigInteger test_prime("21312113");
-=======
-//    BigInteger test_prime("155251809230070893514897948846250255525688601711663681113905203802605095268637688232123840882864647795048773069713113");
->>>>>>> f05c2c274f719be84e277f31c008aee0e45f4f41
 //    std::cout << test_prime.is_probable_prime(5) << "\n";
 //    (BigInteger(6704).pow(BigInteger(2743), BigInteger(123))).print();
     std::vector<unsigned int> a;
     std::vector<unsigned int> b;
-//    srand(unsigned(time(NULL)));
-//    for (int i = 0; i < 48; i++) {
-//        a.push_back(rand() % 65536);
-//    }
-//    for (int i = 0; i < 24; i++) {
-//        b.push_back(rand() % 65536);
-//    }
-    a.push_back(0);
-    a.push_back(2);
-    b.push_back(2);
+    srand(unsigned(time(NULL)));
+    for (int i = 0; i < 48; i++) {
+        a.push_back(rand() % 65536);
+    }
+    for (int i = 0; i < 24; i++) {
+        b.push_back(rand() % 65536);
+    }
+//    a.push_back(0);
+//    a.push_back(53);
+//    a.push_back(54);
+//    a.push_back(548);
+//    a.push_back(542);
+//    a.push_back(62);
+//    a.push_back(542);
+//    b.push_back(2);
 
     BigInteger Bia(a);
     Bia.print();
     BigInteger Bib(b);
     Bib.print();
 
-    (Bia / Bib).print();
-
-//    std::cout << BigInteger::bigger_than(Bia, 0, 2, Bib);
 //    clock_t start = clock();
-//    for (int i = 0; i < 10000; i++) {
-//        Bia / Bib;
-//    }
+//    Bia.generate_rand_prime(15,5).print();
 //    clock_t end = clock();
 //    std::cout << (double)(end - start) / CLOCKS_PER_SEC << "s\n";
-//
-//    start = clock();
-//    for (int i = 0; i < 10000; i++) {
-//        Bia % Bib;
-//    }
-//    end = clock();
-//    std::cout << (double)(end - start) / CLOCKS_PER_SEC << "s\n";
+
+//    (Bia / Bib).print();
+
+    std::cout << BigInteger::bigger_or_equal(Bia, 0, 2, Bib);
+    clock_t start = clock();
+    for (int i = 0; i < 100; i++) {
+        Bia / Bib;
+    }
+    clock_t end = clock();
+    std::cout << (double)(end - start) / CLOCKS_PER_SEC << "s\n";
+
+    start = clock();
+    for (int i = 0; i < 100; i++) {
+        Bia % Bib;
+    }
+    end = clock();
+    std::cout << (double)(end - start) / CLOCKS_PER_SEC << "s\n";
 
 //    for (int i = 0; i < 100; i++) {
 //        b.push_back(rand() % 65536);

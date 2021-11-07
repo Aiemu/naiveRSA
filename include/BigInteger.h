@@ -15,9 +15,14 @@ class BigInteger {
         std::vector<unsigned int> num;
 
     public:
+        static BigInteger Zero;
+        static BigInteger One;
+        static BigInteger Two;
+
+    public:
         BigInteger();
         explicit BigInteger(long long num);
-        explicit BigInteger(const char* num);
+//        explicit BigInteger(const char* num);
         explicit BigInteger(std::vector<unsigned int> num);
         explicit BigInteger(bool sign, std::vector<unsigned int> num);
         ~BigInteger();
@@ -36,36 +41,38 @@ class BigInteger {
 
         BigInteger operator+(const BigInteger &num_b);
         BigInteger operator-(const BigInteger &num_b);
-        BigInteger operator*(const BigInteger &num_b);
-        BigInteger operator/(const BigInteger &num_b);
-        BigInteger operator%(const BigInteger &num_b);
+        BigInteger operator*(const BigInteger &num_b) const;
+        BigInteger operator/(const BigInteger &num_b) const;
+        BigInteger operator%(const BigInteger &num_b) const;
 
         BigInteger operator++(); // front
         BigInteger operator--();
         BigInteger operator++(int); // back
         BigInteger operator--(int);
-        BigInteger operator+=(BigInteger num_b);
-        BigInteger operator-=(BigInteger num_b);
-        BigInteger operator*=(BigInteger num_b);
-        BigInteger operator/=(BigInteger num_b);
-        BigInteger operator%=(BigInteger num_b);
+        BigInteger operator+=(const BigInteger &num_b);
+        BigInteger operator-=(const BigInteger &num_b);
+        BigInteger operator*=(const BigInteger &num_b);
+        BigInteger operator/=(const BigInteger &num_b);
+        BigInteger operator%=(const BigInteger &num_b);
         BigInteger pow(BigInteger k);
         BigInteger pow(BigInteger k, BigInteger mod);
-        static bool bigger_than(const BigInteger &num_a, long long begin, long long end, const BigInteger &num_b);
+        static bool bigger_or_equal(const BigInteger &num_a, long long begin, long long end, const BigInteger &num_b);
 
         // Functions to get attributes
         bool& get_sign();
         std::vector<unsigned int>& get_num();
-        BigInteger get_abs();
+        BigInteger get_abs() const;
 
         // Functions for auxiliary
         void print();
         void format();
 
-        BigInteger generate_rand_big_integer(long long len);
-        BigInteger generate_rand_big_integer(BigInteger begin, BigInteger end);
-        bool try_composite(BigInteger a, BigInteger m, BigInteger k);
-        bool is_probable_prime(int certainty);
+        bool is_prime(BigInteger &num, int certainty);
+        BigInteger generate_rand_odd_integer(long long len);
+        BigInteger generate_rand_odd_integer(BigInteger &num);
+        BigInteger generate_rand_prime(long long len, int certainty);
+        bool try_composite(BigInteger &a, BigInteger &m, BigInteger &k, BigInteger &num);
+//        bool is_probable_prime(int certainty);
 };
 
 
