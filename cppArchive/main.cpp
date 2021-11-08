@@ -34,14 +34,9 @@ int main() {
     for (int i = 0; i < 24; i++) {
         b.push_back(rand() % 65536);
     }
-//    a.push_back(0);
-//    a.push_back(53);
-//    a.push_back(54);
-//    a.push_back(548);
-//    a.push_back(542);
-//    a.push_back(62);
-//    a.push_back(542);
-//    b.push_back(2);
+//    a.push_back(1);
+//    a.push_back(133);
+//    b.push_back(3);
 
     BigInteger Bia(a);
     Bia.print();
@@ -55,7 +50,6 @@ int main() {
 
 //    (Bia / Bib).print();
 
-    std::cout << BigInteger::bigger_or_equal(Bia, 0, 2, Bib);
     clock_t start = clock();
     for (int i = 0; i < 100; i++) {
         Bia / Bib;

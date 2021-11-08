@@ -284,39 +284,41 @@ BigInteger BigInteger::operator*(const BigInteger &num_b) const {
 
 BigInteger BigInteger::operator/(const BigInteger &num_b) const {
     BigInteger ret;
-    if (num_b.num.size() == 1) {
-        unsigned int rem = 0;
-        BigInteger tmp(vector<unsigned int>(this->num.size(), 0));
-        for (int i = this->num.size() - 1; i >= 0; i--) {
-            rem = rem * 65536 + rem + this->num[i];
-            tmp.num[i] = rem / num_b.num[0];
-            rem = rem % num_b.num[0];
-        }
-        return tmp;
+    BigInteger reminder;
+    BigInteger num_b_abs(true, num_b.num);
+    if (ret == num_b) {
+        throw std::runtime_error("Divider can not be zero.");
     }
-    long long len_a = this->num.size();
-    long long len_b = num_b.num.size();
-    ret.num = vector<unsigned int>(len_a, 0);
-    BigInteger reminder(this->num);
-    for (long long i = len_a - len_b; i >= 0; i++) {
-        while (BigInteger::bigger_or_equal(reminder, i, len_a, num_b)) {
-            BigInteger tmp_b(num_b.num);
-            while (BigInteger::bigger_or_equal(reminder, i, len_a, tmp_b)) {
-                tmp_b = tmp_b * BigInteger::Two;
-            }
-            tmp_b = tmp_b / BigInteger::Two;
-            long long len_tmp_b = tmp_b.num.size();
-            for (long long j = i; i < j + len_tmp_b; j++) {
-                if (reminder.num[j] >= tmp_b.num[j - i]) {
-                    reminder.num[j] = reminder.num[j] - tmp_b.num[j - i];
-                }
-                else {
-                    
-                }
-            }
+    else if (ret == *this) {}
+    else if (this->get_abs() == num_b_abs) {
+        if ((num_b.sign && this->sign) || (!num_b.sign && !this->sign)) {
+            return BigInteger::One;
+        } else {
+            return BigInteger(-1);
         }
     }
-
+    else if (this->get_abs() > num_b_abs) {
+        unsigned int low, high, mid;
+        ret.num = vector<unsigned int>(this->num.size(), 0);
+        reminder.num.clear();
+        for (long long i = this->num.size() - 1; i >= 0; i--) {
+            reminder.num.insert(reminder.num.begin(), 0);
+            reminder = reminder + BigInteger(this->num[i]);
+            low = 0;
+            high = 65536;
+            while (low + 1 < high) {
+                mid = (low + high) >> 1;
+                if (num_b * BigInteger(mid) <= reminder)
+                    low = mid;
+                else
+                    high = mid;
+            }
+            ret.num[i] = low;
+            reminder = reminder - num_b * BigInteger(low);
+        }
+    }
+    else if (this->get_abs() < num_b_abs) {}
+    ret.format();
     return ret;
 }
 
