@@ -36,7 +36,6 @@ For each encryption level, we conducted about 8 tests here. Although the uneven 
 |`RSA-1024`|0.2103|0.2498|0.1179|0.3339|0.2007|0.7944|0.1952|0.3148|
 |`RSA-2048`|1.3014|2.7838|1.6395|5.2259|1.7065|2.2202|2.2947|0.8495|
 |`RSA-4096`|28.493|13.7593|27.1998|7.4041|15.4106|53.4131|8.0431|22.8291|
-|
 
 #### Encrypt and Decrypt
 In order to compare the two decryption speeds more clearly and reduce the interference of other factors, we used 8 different keys that complies with RSA-2048 for testing. The information used for encryption contains a total of 300 Chinese and English characters of various types
@@ -46,7 +45,6 @@ In order to compare the two decryption speeds more clearly and reduce the interf
 |`En`|0.546|0.5311|0.5231|0.5476|0.548|0.5517|0.5545|0.5439|
 |`De`|0.5891|0.5483|0.5347|0.5566|0.5622|0.5535|0.5383|0.5738|
 |`De_CRT`|0.1923|0.1887|0.1956|0.1923|0.192|0.1828|0.1843|0.1906|
-|
 
 ## Usage
 ### Quick Start
