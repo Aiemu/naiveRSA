@@ -281,9 +281,13 @@ class MyMainForm(QMainWindow, Ui_MainWindow):
         # print(hex(self.n))
         # print(hex(self.d))
         for i in range(len(c_list) - 1):
-            m_slice = fast_pow(int(c_list[i][12:-13], base=16), self.d, self.n)
-            # print('m_slice:', m_slice)
-            m += m_slice.to_bytes(((m_slice.bit_length() + 7) // 8), byteorder="big").decode("utf-8")
+            try:
+                m_slice = fast_pow(int(c_list[i][12:-13], base=16), self.d, self.n)
+                # print('m_slice:', m_slice)
+                m += m_slice.to_bytes(((m_slice.bit_length() + 7) // 8), byteorder="big").decode("utf-8")
+            except:
+                QMessageBox.warning(self, '提示', '请检查密文的正确性', QMessageBox.No | QMessageBox.Yes, QMessageBox.Yes)
+                return
 
         self.ciphertext_input.setText(m)
         self.de_time.setText(str(round(time.time() - start, 4)) + 's')
@@ -313,12 +317,16 @@ class MyMainForm(QMainWindow, Ui_MainWindow):
         # print(self.n)
         # print(self.d)
         for i in range(len(c_list) - 1):
-            m_slice = (fast_pow(int(c_list[i][12:-13], base=16) % self.q, self.d % (self.q - 1), self.q) *
-                       self.p * inverse(self.p, self.q) +
-                       fast_pow(int(c_list[i][12:-13], base=16) % self.p, self.d % (self.p - 1), self.p) *
-                       self.q * inverse(self.q, self.p)) % self.n
-            # print('m_slice: ', m_slice)
-            m += m_slice.to_bytes(((m_slice.bit_length() + 7) // 8), byteorder="big").decode("utf-8")
+            try:
+                m_slice = (fast_pow(int(c_list[i][12:-13], base=16) % self.q, self.d % (self.q - 1), self.q) *
+                           self.p * inverse(self.p, self.q) +
+                           fast_pow(int(c_list[i][12:-13], base=16) % self.p, self.d % (self.p - 1), self.p) *
+                           self.q * inverse(self.q, self.p)) % self.n
+                # print('m_slice: ', m_slice)
+                m += m_slice.to_bytes(((m_slice.bit_length() + 7) // 8), byteorder="big").decode("utf-8")
+            except:
+                QMessageBox.warning(self, '提示', '请检查密文的正确性', QMessageBox.No | QMessageBox.Yes, QMessageBox.Yes)
+                return
 
         self.ciphertext_input.setText(m)
         self.de_time.setText(str(round(time.time() - start, 4)) + 's')
